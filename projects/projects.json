@@ -1,0 +1,12 @@
+[
+  {
+    "name": "AQI Predictor",
+    "desc": "Air Quality Index prediction web app that forecasts AQI from environmental data and provides an easy-to-read live web interface.",
+    "image": "project1",
+    "category": "mern",
+    "links": {
+      "view": "https://aqi-predictor-1-g3la.onrender.com/",
+      "code": "https://github.com/Eljiedetuya/AQI-Predictor.git"
+    }
+  }
+]
