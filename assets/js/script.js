@@ -8,6 +8,7 @@ $(document).ready(function () {
     $(window).on('scroll load', function () {
         $('#menu').removeClass('fa-times');
         $('.navbar').removeClass('nav-toggle');
+        $('header').toggleClass('scrolled', window.scrollY > 20);
 
         if (window.scrollY > 60) {
             document.querySelector('#scroll-top').classList.add('active');
@@ -30,10 +31,13 @@ $(document).ready(function () {
     });
 
     // smooth scrolling
-    $('a[href*="#"]').on('click', function (e) {
+    $('a[href^="#"]').on('click', function (e) {
+        const target = $(this).attr('href');
+        const targetEl = $(target);
+        if (!targetEl.length) return;
         e.preventDefault();
         $('html, body').animate({
-            scrollTop: $($(this).attr('href')).offset().top,
+            scrollTop: targetEl.offset().top,
         }, 500, 'linear')
     });
 
@@ -53,6 +57,8 @@ $(document).ready(function () {
         const cleanUrl = `${url.pathname}${cleanSearch ? `?${cleanSearch}` : ''}${url.hash}`;
         window.history.replaceState({}, '', cleanUrl);
     }
+
+    initHeroAvatar3D();
 
 });
 
@@ -98,15 +104,19 @@ function showSkills(skills) {
     let skillsContainer = document.getElementById("skillsContainer");
     let skillHTML = "";
     skills.forEach(skill => {
+        const skillLevel = getSkillLevel(skill.name);
         skillHTML += `
-        <div class="bar">
+        <div class="bar" style="--skill-level:${skillLevel}%;">
               <div class="info">
                 <img src=${skill.icon} alt="skill" />
                 <span>${skill.name}</span>
+                <small>${skillLevel}%</small>
               </div>
+              <div class="skill-meter"><span></span></div>
             </div>`
     });
     skillsContainer.innerHTML = skillHTML;
+    initSkillBarObserver();
 }
 
 function showProjects(projects) {
@@ -114,7 +124,7 @@ function showProjects(projects) {
     let projectHTML = "";
     projects.slice(0, 10).filter(project => project.category != "android").forEach(project => {
         projectHTML += `
-        <div class="box tilt">
+        <div class="box card-3d">
       <img draggable="false" src="/assets/images/projects/${project.image}.png" alt="project" />
       <div class="content">
         <div class="tag">
@@ -131,23 +141,7 @@ function showProjects(projects) {
     </div>`
     });
     projectsContainer.innerHTML = projectHTML;
-
-    // <!-- tilt js effect starts -->
-    VanillaTilt.init(document.querySelectorAll(".tilt"), {
-        max: 15,
-    });
-    // <!-- tilt js effect ends -->
-
-    /* ===== SCROLL REVEAL ANIMATION ===== */
-    const srtop = ScrollReveal({
-        origin: 'top',
-        distance: '80px',
-        duration: 1000,
-        reset: true
-    });
-
-    /* SCROLL PROJECTS */
-    srtop.reveal('.work .box', { interval: 200 });
+    init3DHoverCards();
 
 }
 
@@ -160,11 +154,158 @@ fetchData("projects").then(data => {
 });
 
 // <!-- tilt js effect starts -->
-VanillaTilt.init(document.querySelectorAll(".tilt"), {
-    max: 15,
+VanillaTilt.init(document.querySelectorAll(".tilt:not(.hero-avatar)"), {
+    max: 12,
+    speed: 400,
+    perspective: 1100,
+    glare: true,
+    "max-glare": 0.18,
+    scale: 1.02,
 });
 // <!-- tilt js effect ends -->
 
+function getSkillLevel(name) {
+    const levels = {
+        "ReactJS": 92,
+        "NodeJS": 88,
+        "Android": 84,
+        "TailwindCSS": 90,
+        "Bootstrap": 89,
+        "Sass": 82,
+        "HTML5": 96,
+        "CSS3": 94,
+        "JavaScript": 92,
+        "Python": 89,
+        "MySQL": 85,
+        "Vercel": 82,
+        "Git VCS": 90,
+        "GitHub": 92,
+        "Figma": 87,
+        "Adobe Photoshop": 88,
+        "Adobe Illustrator": 83,
+        "Adobe Premiere Pro": 81,
+        "Capcut": 86,
+        "Canva": 90,
+        "Django": 84,
+        "PowerPoint": 89,
+        "Excel": 86,
+        "Word": 90,
+        "Google Docs": 91,
+        "Google Sheets": 86,
+        "Google Slides": 88,
+        "Docker": 78
+    };
+    return levels[name] || 80;
+}
+
+function initSkillBarObserver() {
+    const bars = document.querySelectorAll(".skills .bar");
+    if (!bars.length) return;
+
+    const observer = new IntersectionObserver((entries, ob) => {
+        entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add("in-view");
+            ob.unobserve(entry.target);
+        });
+    }, { threshold: 0.4 });
+
+    bars.forEach((bar) => observer.observe(bar));
+}
+
+function initHeroAvatar3D() {
+    const stack = document.querySelector(".avatar-stack");
+    if (!stack) return;
+    if (!window.matchMedia("(pointer:fine)").matches) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const orbit = stack.closest(".avatar-orbit");
+    const damp = 14;
+
+    const applyTilt = (event) => {
+        const rect = stack.getBoundingClientRect();
+        const offsetX = (event.clientX - rect.left) / rect.width - 0.5;
+        const offsetY = (event.clientY - rect.top) / rect.height - 0.5;
+        const rotateY = offsetX * damp;
+        const rotateX = -offsetY * (damp * 0.75);
+
+        stack.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`;
+    };
+
+    stack.addEventListener("mousemove", applyTilt);
+    stack.addEventListener("mouseenter", () => {
+        orbit && orbit.classList.add("is-hovered");
+    });
+    stack.addEventListener("mouseleave", () => {
+        stack.style.transform = "";
+        orbit && orbit.classList.remove("is-hovered");
+    });
+}
+
+function init3DHoverCards() {
+    const cards = document.querySelectorAll(".work .card-3d");
+    cards.forEach((card) => {
+        card.addEventListener("mousemove", (event) => {
+            const rect = card.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            const rotateY = ((x / rect.width) - 0.5) * 14;
+            const rotateX = (0.5 - (y / rect.height)) * 12;
+
+            card.style.setProperty("--mx", `${(x / rect.width) * 100}%`);
+            card.style.setProperty("--my", `${(y / rect.height) * 100}%`);
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`;
+        });
+
+        card.addEventListener("mouseleave", () => {
+            card.style.transform = "";
+            card.style.setProperty("--mx", "50%");
+            card.style.setProperty("--my", "50%");
+        });
+    });
+}
+
+function initGlowingCursor() {
+    if (!window.matchMedia("(pointer:fine)").matches) return;
+
+    const dot = document.createElement("div");
+    const glow = document.createElement("div");
+    dot.className = "cursor-dot";
+    glow.className = "cursor-glow";
+    document.body.appendChild(glow);
+    document.body.appendChild(dot);
+
+    const pos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const glowPos = { x: pos.x, y: pos.y };
+
+    window.addEventListener("mousemove", (event) => {
+        pos.x = event.clientX;
+        pos.y = event.clientY;
+        dot.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
+    });
+
+    const tick = () => {
+        glowPos.x += (pos.x - glowPos.x) * 0.15;
+        glowPos.y += (pos.y - glowPos.y) * 0.15;
+        glow.style.transform = `translate(${glowPos.x}px, ${glowPos.y}px)`;
+        window.requestAnimationFrame(tick);
+    };
+    tick();
+
+    document.addEventListener("mouseover", (event) => {
+        if (!event.target.closest("a, button, .btn, input, textarea, #menu, .bar, .card-3d")) return;
+        dot.classList.add("cursor-hover");
+        glow.classList.add("cursor-hover");
+    });
+
+    document.addEventListener("mouseout", (event) => {
+        if (!event.target.closest("a, button, .btn, input, textarea, #menu, .bar, .card-3d")) return;
+        dot.classList.remove("cursor-hover");
+        glow.classList.remove("cursor-hover");
+    });
+}
+
+initGlowingCursor();
 
 // pre loader start
 // function loader() {
@@ -210,47 +351,40 @@ var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
 
 /* ===== SCROLL REVEAL ANIMATION ===== */
 const srtop = ScrollReveal({
-    origin: 'top',
-    distance: '80px',
-    duration: 1000,
-    reset: true
+    origin: 'bottom',
+    distance: '42px',
+    duration: 900,
+    reset: false,
+    easing: 'cubic-bezier(.22,.68,0,1)'
 });
 
 /* SCROLL HOME */
-srtop.reveal('.home .content h3', { delay: 200 });
-srtop.reveal('.home .content p', { delay: 200 });
-srtop.reveal('.home .content .btn', { delay: 200 });
-
-srtop.reveal('.home .image', { delay: 400 });
-srtop.reveal('.home .linkedin', { interval: 600 });
-srtop.reveal('.home .github', { interval: 800 });
-srtop.reveal('.home .twitter', { interval: 1000 });
-srtop.reveal('.home .telegram', { interval: 600 });
-srtop.reveal('.home .instagram', { interval: 600 });
-srtop.reveal('.home .dev', { interval: 600 });
+srtop.reveal('.home .content h2', { delay: 120, origin: 'left' });
+srtop.reveal('.home .content p', { delay: 220, origin: 'left' });
+srtop.reveal('.home .content .btn', { delay: 320, origin: 'left' });
+srtop.reveal('.home .image', { delay: 260, origin: 'right' });
+srtop.reveal('.home .social-icons li', { interval: 120, delay: 420, origin: 'bottom' });
 
 /* SCROLL ABOUT */
-srtop.reveal('.about .content h3', { delay: 200 });
-srtop.reveal('.about .content .tag', { delay: 200 });
-srtop.reveal('.about .content p', { delay: 200 });
-srtop.reveal('.about .content .box-container', { delay: 200 });
-srtop.reveal('.about .content .resumebtn', { delay: 200 });
+srtop.reveal('.about .row .image', { delay: 100, origin: 'left' });
+srtop.reveal('.about .content h3, .about .content .tag, .about .content p, .about .content .box-container, .about .content .resumebtn', { interval: 90, delay: 140, origin: 'right' });
 
 
 /* SCROLL SKILLS */
-srtop.reveal('.skills .container', { interval: 200 });
-srtop.reveal('.skills .container .bar', { delay: 400 });
+srtop.reveal('.skills .container', { delay: 120 });
+srtop.reveal('.skills .container .bar', { interval: 70, delay: 120, origin: 'bottom' });
 
 /* SCROLL EDUCATION */
-srtop.reveal('.education .box', { interval: 200 });
+srtop.reveal('.education .qoute', { delay: 120 });
+srtop.reveal('.education .box', { interval: 180, delay: 120 });
 
 /* SCROLL PROJECTS */
-srtop.reveal('.work .box', { interval: 200 });
+srtop.reveal('.work .box', { interval: 120, origin: 'bottom' });
 
 /* SCROLL EXPERIENCE */
-srtop.reveal('.experience .timeline', { delay: 400 });
-srtop.reveal('.experience .timeline .container', { interval: 400 });
+srtop.reveal('.experience .timeline', { delay: 180 });
+srtop.reveal('.experience .timeline .container', { interval: 220, origin: 'left' });
 
 /* SCROLL CONTACT */
-srtop.reveal('.contact .container', { delay: 400 });
-srtop.reveal('.contact .container .form-group', { delay: 400 });
+srtop.reveal('.contact .container', { delay: 140 });
+srtop.reveal('.contact .container .field, .contact .container .message, .contact .button-area', { interval: 80, delay: 220, origin: 'bottom' });

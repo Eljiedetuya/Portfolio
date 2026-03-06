@@ -44,31 +44,60 @@ function getProjects() {
     return fetchProjectsJson();
 }
 
+function getStackLabel(category) {
+    const map = {
+        mern: "MERN",
+        lamp: "LAMP",
+        basicweb: "Web Fundamentals",
+        android: "Android"
+    };
+    return map[category] || "Web App";
+}
+
+function renderProjectStats(projects) {
+    const target = document.getElementById("projectStats");
+    if (!target) return;
+    const categories = new Set(projects.map((p) => p.category)).size;
+    target.innerHTML = `
+      <span class="stat">${projects.length} Total Project${projects.length > 1 ? "s" : ""}</span>
+      <span class="stat">${categories} Active Categor${categories > 1 ? "ies" : "y"}</span>
+      <span class="stat">Live Demos + Source Code</span>
+    `;
+}
+
 
 function showProjects(projects) {
     let projectsContainer = document.querySelector(".work .box-container");
     let projectsHTML = "";
     projects.forEach(project => {
+        const stack = getStackLabel(project.category);
+        const hasView = project.links && project.links.view && project.links.view !== "#";
+        const hasCode = project.links && project.links.code && project.links.code !== "#";
         projectsHTML += `
         <div class="grid-item ${project.category}">
-        <div class="box tilt" style="width: 380px; margin: 1rem">
-      <img draggable="false" src="/assets/images/projects/${project.image}.png" alt="project" />
+        <article class="box tilt">
+      <img draggable="false" src="/assets/images/projects/${project.image}.png" alt="${project.name} project preview" />
       <div class="content">
         <div class="tag">
         <h3>${project.name}</h3>
         </div>
+        <div class="meta">
+          <span>${stack}</span>
+          <span>Production Build</span>
+        </div>
         <div class="desc">
           <p>${project.desc}</p>
           <div class="btns">
-            <a href="${project.links.view}" class="btn" target="_blank"><i class="fas fa-eye"></i> View</a>
-            <a href="${project.links.code}" class="btn" target="_blank">Code <i class="fas fa-code"></i></a>
+            <a href="${hasView ? project.links.view : "#"}" class="btn" target="_blank" rel="noopener noreferrer" aria-label="Open live demo for ${project.name}" ${hasView ? "" : 'aria-disabled="true"'}><i class="fas fa-eye"></i> Live</a>
+            <a href="${hasCode ? project.links.code : "#"}" class="btn" target="_blank" rel="noopener noreferrer" aria-label="Open source code for ${project.name}" ${hasCode ? "" : 'aria-disabled="true"'}><i class="fas fa-code"></i> Code</a>
           </div>
         </div>
       </div>
-    </div>
+    </article>
     </div>`
     });
     projectsContainer.innerHTML = projectsHTML;
+    renderProjectStats(projects);
 
     // vanilla tilt.js
     // VanillaTilt.init(document.querySelectorAll(".tilt"), {
