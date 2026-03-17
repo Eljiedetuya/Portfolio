@@ -85,19 +85,20 @@ var typed = new Typed(".typing-text", {
 });
 // <!-- typed js effect ends -->
 
+async function fetchJson(file, errorMessage) {
+    const response = await fetch(file);
+    if (!response.ok) {
+        throw new Error(errorMessage);
+    }
+    return response.json();
+}
+
 async function fetchData(type = "skills") {
     if (type === "skills") {
-        const response = await fetch("skills.json");
-        return response.json();
+        return fetchJson("./skills.json", "Unable to load skills.json.");
     }
 
-    const projectFiles = ["./projects/project.json", "./projects/projects.json"];
-    for (const file of projectFiles) {
-        const response = await fetch(file);
-        if (response.ok) return response.json();
-    }
-
-    throw new Error("Unable to load projects JSON.");
+    return fetchJson("./projects/project.json", "Unable to load projects/project.json.");
 }
 
 function showSkills(skills) {
@@ -131,11 +132,11 @@ function showProjects(projects) {
         const imageFitClass = project.imageFit === "contain" ? "is-contain" : "";
         const primaryImageClass = `${imageFitClass} ${hasSecondaryImage ? "primary-preview has-secondary" : ""}`.trim();
         const secondaryImageHtml = hasSecondaryImage
-            ? `<img draggable="false" class="secondary-preview" src="/assets/images/projects/${project.secondaryImage}.${secondaryImageExt}" alt="${project.name} additional preview" />`
+            ? `<img draggable="false" class="secondary-preview" src="./assets/images/projects/${project.secondaryImage}.${secondaryImageExt}" alt="${project.name} additional preview" />`
             : "";
         projectHTML += `
         <div class="box card-3d">
-      <img draggable="false" class="${primaryImageClass}" src="/assets/images/projects/${project.image}.${imageExt}" alt="project" />
+      <img draggable="false" class="${primaryImageClass}" src="./assets/images/projects/${project.image}.${imageExt}" alt="project" />
       ${secondaryImageHtml}
       <div class="content">
         <div class="tag">
@@ -347,17 +348,17 @@ document.onkeydown = function (e) {
     }
 }
 
-// Start of Tawk.to Live Chat
-var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
-(function () {
-    var s1 = document.createElement("script"), s0 = document.getElementsByTagName("script")[0];
-    s1.async = true;
-    s1.src = 'https://embed.tawk.to/60df10bf7f4b000ac03ab6a8/1f9jlirg6';
-    s1.charset = 'UTF-8';
-    s1.setAttribute('crossorigin', '*');
-    s0.parentNode.insertBefore(s1, s0);
-})();
-// End of Tawk.to Live Chat
+// // Start of Tawk.to Live Chat
+// var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
+// (function () {
+//     var s1 = document.createElement("script"), s0 = document.getElementsByTagName("script")[0];
+//     s1.async = true;
+//     s1.src = 'https://embed.tawk.to/60df10bf7f4b000ac03ab6a8/1f9jlirg6';
+//     s1.charset = 'UTF-8';
+//     s1.setAttribute('crossorigin', '*');
+//     s0.parentNode.insertBefore(s1, s0);
+// })();
+// // End of Tawk.to Live Chat
 
 
 /* ===== SCROLL REVEAL ANIMATION ===== */

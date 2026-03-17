@@ -32,12 +32,11 @@ document.addEventListener('visibilitychange',
 
 // fetch projects start
 async function fetchProjectsJson() {
-    const files = ["project.json", "projects.json"];
-    for (const file of files) {
-        const response = await fetch(file);
-        if (response.ok) return response.json();
+    const response = await fetch("./project.json");
+    if (!response.ok) {
+        throw new Error("Unable to load project.json.");
     }
-    throw new Error("Unable to load projects JSON.");
+    return response.json();
 }
 
 function getProjects() {
@@ -79,12 +78,12 @@ function showProjects(projects) {
         const imageFitClass = project.imageFit === "contain" ? "is-contain" : "";
         const primaryImageClass = `${imageFitClass} ${hasSecondaryImage ? "primary-preview has-secondary" : ""}`.trim();
         const secondaryImageHtml = hasSecondaryImage
-            ? `<img draggable="false" class="secondary-preview" src="/assets/images/projects/${project.secondaryImage}.${secondaryImageExt}" alt="${project.name} additional preview" />`
+            ? `<img draggable="false" class="secondary-preview" src="../assets/images/projects/${project.secondaryImage}.${secondaryImageExt}" alt="${project.name} additional preview" />`
             : "";
         projectsHTML += `
         <div class="grid-item ${project.category}">
         <article class="box tilt">
-      <img draggable="false" class="${primaryImageClass}" src="/assets/images/projects/${project.image}.${imageExt}" alt="${project.name} project preview" />
+      <img draggable="false" class="${primaryImageClass}" src="../assets/images/projects/${project.image}.${imageExt}" alt="${project.name} project preview" />
       ${secondaryImageHtml}
       <div class="content">
         <div class="tag">
