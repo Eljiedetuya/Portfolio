@@ -274,7 +274,6 @@ header .navbar ul li a:hover{
 .work .box-container .box{
   flex:0 0 auto;
   width: 100%;
-  aspect-ratio: 1 / 1;
   border-radius: 1rem;
   box-shadow: 0 .7rem 1rem rgba(0,0,0,.3);
   position: relative;
@@ -284,9 +283,26 @@ header .navbar ul li a:hover{
   border: 1px solid rgba(0, 234, 255, .18);
 }
 .work .box-container .box img{
-  height: 100%;
+  display: block;
   width:100%;
+  height: auto;
+}
+.work .box-container .box img.is-contain{
+  padding: 1rem;
+  background: #071021;
+}
+.work .box-container .box img.primary-preview.has-secondary,
+.work .box-container .box img.secondary-preview{
+  height: 15rem;
   object-fit: cover;
+  object-position: top center;
+}
+.work .box-container .box img.primary-preview.has-secondary.is-contain{
+  padding: 0;
+  background: transparent;
+}
+.work .box-container .box img.secondary-preview{
+  border-top: 1px solid rgba(0, 234, 255, .18);
 }
 .work .box-container .box .content{
   height: 75%;

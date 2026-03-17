@@ -73,10 +73,19 @@ function showProjects(projects) {
         const stack = getStackLabel(project.category);
         const hasView = project.links && project.links.view && project.links.view !== "#";
         const hasCode = project.links && project.links.code && project.links.code !== "#";
+        const imageExt = project.imageExt ? project.imageExt.replace(".", "") : "png";
+        const hasSecondaryImage = Boolean(project.secondaryImage);
+        const secondaryImageExt = project.secondaryImageExt ? project.secondaryImageExt.replace(".", "") : "png";
+        const imageFitClass = project.imageFit === "contain" ? "is-contain" : "";
+        const primaryImageClass = `${imageFitClass} ${hasSecondaryImage ? "primary-preview has-secondary" : ""}`.trim();
+        const secondaryImageHtml = hasSecondaryImage
+            ? `<img draggable="false" class="secondary-preview" src="/assets/images/projects/${project.secondaryImage}.${secondaryImageExt}" alt="${project.name} additional preview" />`
+            : "";
         projectsHTML += `
         <div class="grid-item ${project.category}">
         <article class="box tilt">
-      <img draggable="false" src="/assets/images/projects/${project.image}.png" alt="${project.name} project preview" />
+      <img draggable="false" class="${primaryImageClass}" src="/assets/images/projects/${project.image}.${imageExt}" alt="${project.name} project preview" />
+      ${secondaryImageHtml}
       <div class="content">
         <div class="tag">
         <h3>${project.name}</h3>

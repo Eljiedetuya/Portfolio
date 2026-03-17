@@ -941,7 +941,6 @@ header .navbar ul li a:hover::after {
 .work .box-container .box {
   flex: 0 0 30rem;
   width: 30rem;
-  aspect-ratio: 1 / 1;
   border-radius: 0.5rem;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
   position: relative;
@@ -954,9 +953,26 @@ header .navbar ul li a:hover::after {
   --my: 50%;
 }
 .work .box-container .box img {
-  height: 100%;
+  display: block;
   width: 100%;
+  height: auto;
+}
+.work .box-container .box img.is-contain {
+  padding: 1rem;
+  background: #071021;
+}
+.work .box-container .box img.primary-preview.has-secondary,
+.work .box-container .box img.secondary-preview {
+  height: 15rem;
   object-fit: cover;
+  object-position: top center;
+}
+.work .box-container .box img.primary-preview.has-secondary.is-contain {
+  padding: 0;
+  background: transparent;
+}
+.work .box-container .box img.secondary-preview {
+  border-top: 1px solid rgba(0, 234, 255, 0.2);
 }
 .work .box-container .box::before {
   content: "";
@@ -1008,6 +1024,8 @@ header .navbar ul li a:hover::after {
 }
 .work .desc p {
   font-size: 1.5rem;
+  line-height: 1.5;
+  text-transform: none;
   max-height: 13rem;
   overflow: hidden;
 }
@@ -1712,9 +1730,12 @@ header .navbar ul li a:hover {
   background: linear-gradient(90deg, #00d9ff, #39ff88);
 }
 
-.work .box-container .box .content .tag h3,
-.work .desc p {
+.work .box-container .box .content .tag h3 {
   color: #03131d;
+}
+
+.work .desc p {
+  color: var(--neon-text);
 }
 
 .work .desc .btns .btn {
@@ -2020,6 +2041,11 @@ html body .work .desc .btns .btn i {
   top: auto !important;
   left: auto !important;
   line-height: 1 !important;
+}
+
+html body .work .desc .btns .btn[aria-disabled="true"] {
+  opacity: 0.5 !important;
+  pointer-events: none !important;
 }
 
 @media (max-width: 600px) {

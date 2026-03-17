@@ -8,5 +8,19 @@
       "view": "https://aqi-predictor-1-g3la.onrender.com/",
       "code": "https://github.com/Eljiedetuya/AQI-Predictor.git"
     }
+  },
+  {
+    "name": "Coke POS System",
+    "desc": "A point-of-sale web app that manages inventory, sales, and reports, helping businesses track stock, generate receipts, and monitor daily sales in real time",
+    "image": "CokePOS",
+    "imageExt": "jpeg",
+    "imageFit": "contain",
+    "secondaryImage": "CokePOS2",
+    "secondaryImageExt": "png",
+    "category": "mern",
+    "links": {
+      "view": "https://coke-pos-frontend.onrender.com/login",
+      "code": ""
+    }
   }
 ]

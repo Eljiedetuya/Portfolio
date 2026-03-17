@@ -8,5 +8,19 @@
       "view": "https://aqi-predictor-1-g3la.onrender.com/",
       "code": "https://github.com/Eljiedetuya/AQI-Predictor.git"
     }
+  },
+  {
+    "name": "Coke POS System",
+    "desc": "Point-of-sale web app for Coca-Cola operations with secure login and streamlined sales workflow.",
+    "image": "CokePOS",
+    "imageExt": "jpeg",
+    "imageFit": "contain",
+    "secondaryImage": "CokePOS2",
+    "secondaryImageExt": "png",
+    "category": "mern",
+    "links": {
+      "view": "https://coke-pos-frontend.onrender.com/login",
+      "code": ""
+    }
   }
 ]

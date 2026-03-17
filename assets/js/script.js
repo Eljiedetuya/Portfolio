@@ -123,9 +123,20 @@ function showProjects(projects) {
     let projectsContainer = document.querySelector("#work .box-container");
     let projectHTML = "";
     projects.slice(0, 10).filter(project => project.category != "android").forEach(project => {
+        const hasView = project.links && project.links.view && project.links.view !== "#";
+        const hasCode = project.links && project.links.code && project.links.code !== "#";
+        const imageExt = project.imageExt ? project.imageExt.replace(".", "") : "png";
+        const hasSecondaryImage = Boolean(project.secondaryImage);
+        const secondaryImageExt = project.secondaryImageExt ? project.secondaryImageExt.replace(".", "") : "png";
+        const imageFitClass = project.imageFit === "contain" ? "is-contain" : "";
+        const primaryImageClass = `${imageFitClass} ${hasSecondaryImage ? "primary-preview has-secondary" : ""}`.trim();
+        const secondaryImageHtml = hasSecondaryImage
+            ? `<img draggable="false" class="secondary-preview" src="/assets/images/projects/${project.secondaryImage}.${secondaryImageExt}" alt="${project.name} additional preview" />`
+            : "";
         projectHTML += `
         <div class="box card-3d">
-      <img draggable="false" src="/assets/images/projects/${project.image}.png" alt="project" />
+      <img draggable="false" class="${primaryImageClass}" src="/assets/images/projects/${project.image}.${imageExt}" alt="project" />
+      ${secondaryImageHtml}
       <div class="content">
         <div class="tag">
         <h3>${project.name}</h3>
@@ -133,8 +144,8 @@ function showProjects(projects) {
         <div class="desc">
           <p>${project.desc}</p>
           <div class="btns">
-            <a href="${project.links.view}" class="btn" target="_blank"><i class="fas fa-eye"></i> View</a>
-            <a href="${project.links.code}" class="btn" target="_blank">Code <i class="fas fa-code"></i></a>
+            <a href="${hasView ? project.links.view : "#"}" class="btn" target="_blank" rel="noopener noreferrer" ${hasView ? "" : 'aria-disabled="true"'}><i class="fas fa-eye"></i> View</a>
+            <a href="${hasCode ? project.links.code : "#"}" class="btn" target="_blank" rel="noopener noreferrer" ${hasCode ? "" : 'aria-disabled="true"'}>Code <i class="fas fa-code"></i></a>
           </div>
         </div>
       </div>
